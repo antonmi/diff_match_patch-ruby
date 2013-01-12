@@ -2,6 +2,9 @@ require 'test/unit'
 require_relative 'diff_match_patch'
 
 class DiffTest < Test::Unit::TestCase
+  Diff  = DiffPatchMatch::Diff
+  Patch = DiffPatchMatch::Patch
+
   def setup
     @dmp = DiffPatchMatch.new
   end

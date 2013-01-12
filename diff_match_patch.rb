@@ -10,56 +10,56 @@ module DMPTextEncode
   end
 end
 
-# Class representing one diff operation (delete, equal or insert)
-Diff = Struct.new(:op, :text)
-
-# Class representing one patch operation
-class Patch
-  include DMPTextEncode
-
-  attr_accessor :start1, :start2
-  attr_accessor :length1, :length2
-  attr_accessor :diffs
-
-  # Constructor
-  def initialize
-    @start1 = @start2 = nil
-    @length1 = @length2 = 0
-    @diffs = []
-  end
-
-  # Emulate GNU diff's format
-  # Header: @@ -382,8 +481,9 @@
-  # Indices are printed as 1-based, not 0-based.
-  def to_s
-    if length1 == 0
-      coords1 = start1.to_s + ",0"
-    elsif length1 == 1
-      coords1 = (start1 + 1).to_s
-    else
-      coords1 = (start1 + 1).to_s + "," + length1.to_s
-    end
-    if length2 == 0
-      coords2 = start2.to_s + ",0"
-    elsif length2 == 1
-      coords2 = (start2 + 1).to_s
-    else
-      coords2 = (start2 + 1).to_s + "," + length2.to_s
-    end
-    text = '@@ -' + coords1 + ' +' + coords2 + " @@\n"
-    # Encode the body of the patch with %xx notation.
-    text += diffs.map do |diff|
-      op = case diff.op
-           when :insert; '+'
-           when :delete; '-'
-           when :equal ; ' '
-           end
-      op + encodeText(diff.text) + "\n"
-    end.join.gsub('%20', ' ')
-  end
-end
-
 class DiffPatchMatch
+  # Class representing one diff operation (delete, equal or insert)
+  Diff = Struct.new(:op, :text)
+
+  # Class representing one patch operation
+  class Patch
+    include DMPTextEncode
+
+    attr_accessor :start1, :start2
+    attr_accessor :length1, :length2
+    attr_accessor :diffs
+
+    # Constructor
+    def initialize
+      @start1 = @start2 = nil
+      @length1 = @length2 = 0
+      @diffs = []
+    end
+
+    # Emulate GNU diff's format
+    # Header: @@ -382,8 +481,9 @@
+    # Indices are printed as 1-based, not 0-based.
+    def to_s
+      if length1 == 0
+        coords1 = start1.to_s + ",0"
+      elsif length1 == 1
+        coords1 = (start1 + 1).to_s
+      else
+        coords1 = (start1 + 1).to_s + "," + length1.to_s
+      end
+      if length2 == 0
+        coords2 = start2.to_s + ",0"
+      elsif length2 == 1
+        coords2 = (start2 + 1).to_s
+      else
+        coords2 = (start2 + 1).to_s + "," + length2.to_s
+      end
+      text = '@@ -' + coords1 + ' +' + coords2 + " @@\n"
+      # Encode the body of the patch with %xx notation.
+      text += diffs.map do |diff|
+        op = case diff.op
+             when :insert; '+'
+             when :delete; '-'
+             when :equal ; ' '
+             end
+        op + encodeText(diff.text) + "\n"
+      end.join.gsub('%20', ' ')
+    end
+  end
+
   include DMPTextEncode
 
   attr_accessor :diff_timeout
